@@ -1,5 +1,6 @@
 import difflib
 import math
+import random
 import re
 from typing import Dict, List, Optional
 import urllib.request
@@ -83,6 +84,68 @@ def smart_find(user_text: str, options: List[str], cutoff: float = 0.45) -> Opti
     return None
 
 
+def run_who_are_you_secret():
+    name = input("Введіть своє ім'я: ").strip() or "Анонім"
+
+    checks = [
+        ("чоткий пацик", "не чоткий пацик"),
+        ("багатий", "не багатий"),
+        ("навчається в IT Step", "не навчається в IT Step"),
+        ("має круту машинку", "має не круту машинку"),
+        ("здав тест", "не здав тест"),
+        ("голодний", "не голодний"),
+        ("вижив", "не вижив"),
+        ("бомж", "не бомж"),
+        ("грає в GTA 6", "не грає в GTA 6"),
+    ]
+
+    print("\n" + "=" * 45)
+    print(f"Ім'я: {name}")
+    for positive, negative in checks:
+        result = positive if random.choice([True, False]) else negative
+        print(f"{name} {result}")
+    print("=" * 45)
+
+
+def run_history_secret():
+    # 3 події -> по 2 перші літери ("КР" + "УТ" + "О!" = "КРУТО!")
+    events = [
+        {
+            "question": "Введіть рік хрещення Київської Русі: ",
+            "year": "988",
+            "title": "Круте хрещення Русі",
+        },
+        {
+            "question": "Введіть рік заснування УТ-1 (українського телебачення): ",
+            "year": "1951",
+            "title": "ут-1 (Перший національний)",
+        },
+        {
+            "question": "Введіть рік проголошення незалежності України (О! Це важлива дата): ",
+            "year": "1991",
+            "title": "о! Незалежність України",
+        },
+    ]
+
+    collected_letters = ""
+    print("\n" + "=" * 45)
+    print("СЕКРЕТКА: Вгадай 3 роки подій та збери слово!")
+
+    for event in events:
+        ans = input(event["question"]).strip()
+        if ans == event["year"]:
+            two_letters = event["title"][:2]
+            collected_letters += two_letters
+            print(f"Вірно! Подія: {event['title']} -> Літери: '{two_letters}' (Зібрано: {collected_letters})")
+        else:
+            print(f"Невірно! Правильний рік: {event['year']}.")
+            print("=" * 45)
+            return
+
+    print(f"\nСекретне слово складено: {collected_letters}")
+    print("=" * 45)
+
+
 def main():
     site_prices = fetch_site_prices(URL)
     if len(site_prices) >= len(CARS_DATABASE["Toyota Corolla Cross"]):
@@ -93,6 +156,22 @@ def main():
 
     print("Доступні моделі в базі:", ", ".join(CARS_DATABASE.keys()))
     raw_car = input("Введіть назву машини (можна з помилкою, напр. 'corila'): ")
+    cleaned_car = raw_car.strip().lower()
+
+    if cleaned_car in {"історія", "події", "секретка"}:
+        run_history_secret()
+        return
+
+    if cleaned_car in {"хто ви є", "хто ви є?"}:
+        run_who_are_you_secret()
+        return
+
+    if cleaned_car in {"в.л", "вл"}:
+        print("\n" + "=" * 45)
+        print("зірики розшуку 6")
+        print("ви реально крутий і ви точно знаєте як вас звати")
+        print("=" * 45)
+        return
 
     matched_car = smart_find(raw_car, list(CARS_DATABASE.keys()))
     if matched_car:
